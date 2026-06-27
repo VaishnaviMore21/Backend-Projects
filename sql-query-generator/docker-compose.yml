@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sql-query-gen-postgres
+    environment:
+      POSTGRES_USER: sqlgen
+      POSTGRES_PASSWORD: 212005
+      POSTGRES_DB: business_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/sample_data.sql:/docker-entrypoint-initdb.d/02-sample-data.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sqlgen"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sql-gen-network
+
+  app:
+    build: .
+    container_name: sql-query-gen-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      FLASK_ENV: production
+      FLASK_DEBUG: "False"
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: business_db
+      POSTGRES_USER: sqlgen
+      POSTGRES_PASSWORD: 212005
+      OLLAMA_API_URL: http://host.docker.internal:11434
+      OLLAMA_MODEL: llama3:latest
+      LOG_LEVEL: INFO
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - sql-gen-network
+
+volumes:
+  postgres_data:
+
+networks:
+  sql-gen-network:
+    driver: bridge

@@ -1,0 +1,127 @@
+REALTIME CHAT BACKEND - PROJECT DETAILS
+
+1) PROJECT OVERVIEW
+- Project name: realtime-chat-backend
+- Stack: Spring Boot 3.3.2, Java 17, Maven
+- Communication: REST APIs and WebSocket/STOMP
+- Persistence: PostgreSQL (JPA/Hibernate)
+- Cache/Broker support: Redis
+- Migrations: Flyway
+- Packaging: Docker + Docker Compose
+
+2) CURRENT STATUS
+- App builds successfully with Maven.
+- App is runnable in Docker network mode with PostgreSQL and Redis.
+- Health endpoint returns UP when DB and Redis are configured correctly.
+- Core API flow is tested: register, login, create/list room, post/get messages.
+
+3) IMPORTANT IMPLEMENTATION NOTES
+- Java version is set to 17 in pom.xml for local compatibility.
+- Flyway PostgreSQL support is enabled using flyway-database-postgresql dependency.
+- Security is currently dev-friendly and allows /api/**, /ws/**, and /actuator/health.
+- JWT is generated on login/register, but request JWT filter enforcement is not implemented yet.
+- Global exception handling includes:
+  - 404 for not found
+  - 409 for conflict
+  - 400 for validation errors
+  - 400 for malformed JSON request body
+  - 500 fallback for unexpected errors
+
+4) DATABASE SCHEMA (V1 migration)
+Tables:
+- users
+  - id, username (unique), email (unique), password_hash, created_at
+- chat_rooms
+  - id, name (unique), created_at
+- chat_messages
+  - id, room_id (FK), sender_id (FK), content, created_at
+Indexes:
+- idx_chat_messages_room_created on (room_id, created_at)
+
+5) MAIN FEATURES IMPLEMENTED
+Authentication:
+- POST /api/auth/register
+- POST /api/auth/login
+
+Users:
+- GET /api/users/by-username/{username}
+  - Added to support fetching senderId via API.
+
+Rooms and messages:
+- POST /api/rooms
+- GET /api/rooms
+- POST /api/rooms/{roomId}/messages
+- GET /api/rooms/{roomId}/messages
+
+WebSocket/STOMP:
+- Endpoint: /ws (SockJS enabled)
+- App destination prefix: /app
+- Topic prefix: /topic
+- Message mapping: /app/chat.send/{roomId}
+- Broadcast topic: /topic/rooms/{roomId}
+
+6) PROJECT STRUCTURE (HIGH LEVEL)
+- src/main/java/com/example/chat
+  - config
+  - controller
+  - domain
+  - dto
+  - exception
+  - repository
+  - service
+- src/main/resources
+  - application.yml
+  - db/migration/V1__init.sql
+- src/test/java/com/example/chat
+
+7) HOW TO RUN (RECOMMENDED)
+A) Start infrastructure:
+- docker compose --env-file .env up -d postgres redis
+
+B) Build app image:
+- docker build -t realtime-chat-backend .
+
+C) Run app container on compose network:
+- docker rm -f rtc-app
+- docker run --name rtc-app --network realtimechatapplication_default -p 8080:8080 -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/chatdb -e SPRING_DATASOURCE_USERNAME=chat_user -e SPRING_DATASOURCE_PASSWORD=chat_pass -e SPRING_FLYWAY_URL=jdbc:postgresql://postgres:5432/chatdb -e SPRING_FLYWAY_USER=chat_user -e SPRING_FLYWAY_PASSWORD=chat_pass -e SPRING_DATA_REDIS_HOST=redis realtime-chat-backend
+
+D) Verify health:
+- curl --location http://localhost:8080/actuator/health
+
+8) COMMON API USAGE FLOW
+1. Register user
+2. Login user
+3. Create room (or reuse existing room)
+4. Send message with senderId
+5. Fetch room messages
+
+9) HOW TO GET senderId USING API
+- Call:
+  GET /api/users/by-username/{username}
+- Example response:
+  {"id": 5, "username": "vaishnavi"}
+- Use id as senderId in message create payload.
+
+10) KNOWN LIMITATIONS
+- No full JWT request authentication filter yet.
+- No dedicated one-to-one direct-message model (currently room-based).
+- application.yml uses localhost defaults; when running app in Docker, datasource/redis host should be overridden with container service names.
+
+11) TROUBLESHOOTING
+A) Flyway unsupported PostgreSQL error
+- Fixed by adding flyway-database-postgresql dependency.
+
+B) Password authentication failed (Postgres)
+- Ensure app uses correct DB credentials and network host.
+- For container mode, use postgres as host.
+
+C) Health returns DOWN
+- Ensure Redis host is set correctly.
+- For container mode, set SPRING_DATA_REDIS_HOST=redis.
+
+D) Register returns malformed JSON error
+- Request body must be valid JSON with quoted keys and values.
+
+12) CURRENT DEV SECURITY BEHAVIOR
+- /api/** is currently permitted for easier development/testing.
+- This should be tightened for production with proper JWT filter and authorization rules.

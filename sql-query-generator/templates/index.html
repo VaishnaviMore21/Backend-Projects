@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Query Generator - Natural Language to SQL</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🔍 SQL Query Generator</h1>
+                <p class="subtitle">Convert Natural Language to SQL Queries</p>
+            </div>
+            <nav class="nav">
+                <a href="/" class="nav-link active">Query</a>
+                <a href="/results" class="nav-link">Results</a>
+                <a href="#logs-section" class="nav-link">Logs</a>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Query Input Section -->
+            <section class="query-section">
+                <div class="section-header">
+                    <h2>Ask a Question</h2>
+                    <p>Describe what data you want to retrieve in natural English</p>
+                </div>
+
+                <form id="queryForm" class="query-form">
+                    <div class="form-group">
+                        <label for="question">Your Question:</label>
+                        <textarea 
+                            id="question" 
+                            name="question" 
+                            placeholder="e.g., 'Show me the top 5 customers by total spending in 2024'"
+                            rows="4"
+                            required></textarea>
+                        <small class="help-text">
+                            Examples: 
+                            <a href="#" class="example" data-question="What are the monthly revenue trends for Q4 2024?">Revenue trends</a> |
+                            <a href="#" class="example" data-question="List products with zero inventory">Zero inventory</a> |
+                            <a href="#" class="example" data-question="Show customers who haven't ordered in 6 months">Inactive customers</a>
+                        </small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="previewBtn" class="btn btn-secondary">
+                            👁️ Preview
+                        </button>
+                        <button type="submit" id="executeBtn" class="btn btn-primary">
+                            ⚡ Generate & Execute
+                        </button>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="checkbox">
+                            <input type="checkbox" id="explainQuery">
+                            <span>Explain the generated SQL</span>
+                        </label>
+                    </div>
+                </form>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="loading-state" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Generating and executing query...</p>
+                </div>
+            </section>
+
+            <!-- Generated SQL Section -->
+            <section id="sqlSection" class="sql-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Generated SQL Query</h2>
+                </div>
+                <div class="sql-display">
+                    <pre id="sqlCode"></pre>
+                    <div class="sql-actions">
+                        <button id="copySqlBtn" class="btn btn-small">Copy SQL</button>
+                        <button id="explainBtn" class="btn btn-small">Explain</button>
+                    </div>
+                </div>
+                <div id="explanation" class="explanation" style="display: none;"></div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section" style="display: none;">
+                <div class="section-header">
+                    <h2>Query Results</h2>
+                    <div class="results-meta">
+                        <span id="resultsMeta"></span>
+                    </div>
+                </div>
+
+                <div class="results-container">
+                    <div class="table-wrapper">
+                        <table id="resultsTable" class="results-table">
+                            <thead id="tableHead"></thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div id="paginationSection" class="pagination" style="display: none;">
+                    <button id="prevBtn" class="btn btn-small" disabled>← Previous</button>
+                    <span id="pageInfo"></span>
+                    <button id="nextBtn" class="btn btn-small" disabled>Next →</button>
+                </div>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>SQL Query Generator v1.0 | Powered by LangChain + PostgreSQL + Ollama</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

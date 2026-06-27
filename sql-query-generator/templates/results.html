@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query Logs - SQL Query Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🔍 SQL Query Generator</h1>
+                <p class="subtitle">Convert Natural Language to SQL Queries</p>
+            </div>
+            <nav class="nav">
+                <a href="/" class="nav-link">Query</a>
+                <a href="/results" class="nav-link active">Results</a>
+                <a href="#" class="nav-link">Logs</a>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Logs Section -->
+            <section class="logs-section">
+                <div class="section-header">
+                    <h2>📋 Audit Logs & Statistics</h2>
+                </div>
+
+                <!-- Statistics -->
+                <div id="statsSection" class="stats-grid" style="display: none;">
+                    <div class="stat-card">
+                        <h3>Total Queries</h3>
+                        <p id="statTotalQueries" class="stat-value">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Successful</h3>
+                        <p id="statSuccessful" class="stat-value">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Failed</h3>
+                        <p id="statFailed" class="stat-value">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Avg Execution Time</h3>
+                        <p id="statAvgTime" class="stat-value">0ms</p>
+                    </div>
+                </div>
+
+                <!-- Logs Table -->
+                <div class="logs-table-wrapper">
+                    <table class="logs-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>User</th>
+                                <th>Question</th>
+                                <th>Status</th>
+                                <th>Rows</th>
+                                <th>Time (ms)</th>
+                                <th>Error</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center">Loading logs...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Log Pagination -->
+                <div class="pagination">
+                    <button id="prevLogsBtn" class="btn btn-small" disabled>← Previous</button>
+                    <span id="logsPageInfo"></span>
+                    <button id="nextLogsBtn" class="btn btn-small" disabled>Next →</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>SQL Query Generator v1.0 | Powered by LangChain + PostgreSQL + Ollama</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='logs.js') }}"></script>
+</body>
+</html>
