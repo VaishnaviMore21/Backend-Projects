@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="page-shell">
+    <main class="card">
+        <span class="eyebrow">Spring Boot + PostgreSQL + Redis</span>
+        <h1>Shorten URLs instantly</h1>
+        <p class="subtitle">
+            Paste a long HTTP or HTTPS URL to generate a compact short link.
+            Redirects are served through Redis-first resolution for low latency.
+        </p>
+
+        <form id="shorten-form" class="shorten-form">
+            <label for="fullUrl" class="label">Long URL</label>
+            <div class="input-row">
+                <input
+                        id="fullUrl"
+                        name="fullUrl"
+                        type="url"
+                        placeholder="https://example.com/some/very/long/path"
+                        autocomplete="off"
+                        required
+                >
+                <button id="submit-button" type="submit">Shorten</button>
+            </div>
+            <p class="helper-text">Only absolute HTTP/HTTPS URLs are accepted.</p>
+        </form>
+
+        <section id="feedback" class="feedback hidden" aria-live="polite"></section>
+
+        <section id="result-card" class="result-card hidden" aria-live="polite">
+            <h2>Your short URL</h2>
+            <div class="result-row">
+                <input id="short-url-output" class="result-input" type="text" readonly>
+                <button id="copy-button" type="button" class="secondary-button">Copy</button>
+            </div>
+            <div class="result-actions">
+                <a id="open-link" class="link-button" href="#" target="_blank" rel="noopener noreferrer">Open short URL</a>
+                <a id="target-link" class="text-link" href="#" target="_blank" rel="noopener noreferrer">Open original URL</a>
+            </div>
+        </section>
+
+        <section class="info-grid">
+            <article>
+                <h3>How it works</h3>
+                <ul>
+                    <li>PostgreSQL creates a numeric ID</li>
+                    <li>The ID is encoded to Base62</li>
+                    <li>Redis stores the shortCode → originalUrl mapping</li>
+                </ul>
+            </article>
+            <article>
+                <h3>API endpoints</h3>
+                <ul>
+                    <li><code>POST /shorten</code></li>
+                    <li><code>GET /{shortCode}</code></li>
+                    <li><code>GET /actuator/health</code></li>
+                </ul>
+            </article>
+        </section>
+    </main>
+</div>
+<script src="/app.js" defer></script>
+</body>
+</html>
+
