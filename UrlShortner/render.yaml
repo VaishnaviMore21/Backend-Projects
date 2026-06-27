@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: urlshortner-api
+    env: docker
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: APP_CACHE_TTL_SECONDS
+        value: "86400"
+
