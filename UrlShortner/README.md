@@ -1,7 +1,9 @@
 # Redis-Cached URL Shortener
 
 Production-ready URL shortener built with **Spring Boot**, **PostgreSQL**, and **Redis**.
+## Output
 
+![URL Shortener Output](docs/images/url-shortener-output.png)
 ## Features
 
 - Shorten long URLs with deterministic **Base62** encoding
